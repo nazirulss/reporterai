@@ -1,0 +1,27 @@
+# Logs & Runtime
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local Scratch & Test Scripts
+scratch/
+
+# Legacy / Backup Single-File Versions (optional)
+reporter_ai_newsroom_workspace.html
