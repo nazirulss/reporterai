@@ -89,3 +89,12 @@ function doPost(e) {
     return Response.jsonOutput(errorObj);
   }
 }
+
+/**
+ * Manual test / One-time authorization trigger
+ * Run this function in Apps Script editor to grant Drive and Sheets permissions.
+ */
+function setupAuth() {
+  const result = Router.routeRequest({ action: 'healthCheck', payload: {}, method: 'GET' });
+  Logger.log('Result: ' + JSON.stringify(result));
+}
