@@ -206,7 +206,7 @@
         <span>Liputan Baru</span>
       </button>
 
-      <div class="border-l border-gray-200 pl-2 hidden sm:flex items-center">
+      <div id="container-reset-demo" class="border-l border-gray-200 pl-2 hidden sm:flex items-center">
         <button onclick="Screens.confirmResetDemo()" title="Reset Demo ke data synthetic awal" class="text-xs text-gray-500 hover:text-brand font-medium border border-gray-200 hover:border-brand px-2 py-1 rounded bg-gray-50 transition-colors">
           Reset Demo
         </button>
@@ -1999,6 +1999,7 @@
 
         return `
           <div class="space-y-6">
+            ${CONFIG.DEMO_MODE ? `
             <!-- Notice Banner: Synthetic Mode -->
             <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center justify-between text-xs text-purple-900">
               <div class="flex items-center gap-2">
@@ -2012,6 +2013,21 @@
                 Konfigurasi Backend
               </button>
             </div>
+            ` : `
+            <!-- Live Backend Banner -->
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-center justify-between text-xs text-emerald-900">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <div>
+                  <span class="font-bold">LIVE BACKEND TERHUBUNG:</span>
+                  Terkoneksi langsung ke Google Apps Script dan Google Sheets Database.
+                </div>
+              </div>
+              <button onclick="Screens.syncProjectsFromBackend(); Toast.success('Data proyek disinkronkan dari Google Sheets!');" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-900 px-3 py-1 rounded font-semibold transition-colors">
+                ↻ Sinkronkan Data
+              </button>
+            </div>
+            `}
 
             <!-- Welcome Header -->
             <div class="bg-surface rounded-xl p-6 border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -3951,23 +3967,44 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
         `;
       },
 
+      updateModeBadge(isDemo) {
+        const badge = document.getElementById("mode-badge");
+        if (badge) {
+          badge.className = isDemo
+            ? "flex items-center gap-1.5 bg-purple-50 text-purple-900 text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded border border-purple-200 font-medium"
+            : "flex items-center gap-1.5 bg-emerald-50 text-emerald-900 text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded border border-emerald-200 font-medium";
+          badge.innerHTML = isDemo ? `
+            <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+            <span class="hidden sm:inline">DEMO MODE (SYNTHETIC DATA)</span>
+            <span class="sm:hidden font-bold">DEMO</span>
+          ` : `
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="hidden sm:inline">LIVE BACKEND</span>
+            <span class="sm:hidden font-bold">LIVE</span>
+          `;
+        }
+        const resetContainer = document.getElementById("container-reset-demo");
+        if (resetContainer) {
+          if (isDemo) resetContainer.classList.remove("hidden");
+          else resetContainer.classList.add("hidden");
+        }
+        const healthDot = document.getElementById("quick-health-dot");
+        if (healthDot) healthDot.className = isDemo ? "w-2 h-2 rounded-full bg-purple-500" : "w-2 h-2 rounded-full bg-emerald-500";
+        const dbStatus = document.getElementById("quick-db-status");
+        if (dbStatus) dbStatus.innerText = isDemo ? "MOCK (Simulasi)" : "Connected (Spreadsheet)";
+        const aiStatus = document.getElementById("quick-ai-status");
+        if (aiStatus) aiStatus.innerText = isDemo ? "SIMULATED (Saran)" : "Gemini API Proxy";
+      },
+
       toggleDemoMode(checked) {
         CONFIG.DEMO_MODE = checked;
         localStorage.setItem("REPORTER_AI_DEMO_MODE", checked ? "true" : "false");
-        document.getElementById("mode-badge").innerHTML = checked ? `
-          <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-          <span>DEMO MODE (SYNTHETIC DATA)</span>
-        ` : `
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span>LIVE BACKEND</span>
-        `;
-        document.getElementById("quick-health-dot").className = checked ? "w-2 h-2 rounded-full bg-purple-500" : "w-2 h-2 rounded-full bg-emerald-500";
-        document.getElementById("quick-db-status").innerText = checked ? "MOCK (Simulasi)" : "Connected (Spreadsheet)";
-        document.getElementById("quick-ai-status").innerText = checked ? "SIMULATED (Saran)" : "Gemini API Proxy";
+        Screens.updateModeBadge(checked);
         if (!checked) {
           Screens.syncProjectsFromBackend();
         }
         Toast.info(`Mode diubah ke: ${checked ? 'DEMO MODE (SINTETIS)' : 'LIVE API'}`);
+        Router.render();
       },
 
       saveApiUrl() {
@@ -4456,6 +4493,9 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
 
       // Initialize Synthetic Test Fixture
       initSyntheticState();
+
+      // Update UI Mode Badge & Elements
+      Screens.updateModeBadge(CONFIG.DEMO_MODE);
 
       // Sync with live backend if configured
       if (!CONFIG.DEMO_MODE && CONFIG.API_BASE_URL) {
