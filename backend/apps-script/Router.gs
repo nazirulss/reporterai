@@ -12,6 +12,7 @@ const Router = {
    */
   _actionRegistry: {
     healthCheck: 'handleHealthCheck',
+    initDatabase: 'handleInitDatabase',
     createProject: 'handleCreateProject',
     getProject: 'handleGetProject',
     listProjects: 'handleListProjects',
@@ -153,6 +154,27 @@ const Router = {
       },
       database: spreadsheetReachable ? 'CONNECTED' : (isSpreadsheetConfigured ? 'ERROR' : 'NOT_CONFIGURED'),
       notes: spreadsheetNote
+    };
+  },
+
+  /**
+   * Handle 'initDatabase' action.
+   * Creates and initializes all 17 canonical sheets with headers.
+   */
+  handleInitDatabase(payload) {
+    SpreadsheetService.initializeAllSheets();
+    // Also remove default Sheet1 if exists
+    try {
+      const db = SpreadsheetService.getDatabase();
+      const defaultSheet = db.getSheetByName('Sheet1');
+      if (defaultSheet && db.getSheets().length > 1) {
+        db.deleteSheet(defaultSheet);
+      }
+    } catch (e) {}
+
+    return {
+      message: 'All 17 database sheets successfully created and initialized.',
+      sheets: Object.keys(CanonicalSchemas)
     };
   },
 

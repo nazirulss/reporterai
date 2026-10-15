@@ -1,0 +1,31 @@
+{
+  "name": "REPORTER AI — Newsroom Workspace",
+  "short_name": "REPORTER AI",
+  "description": "Institutional-Grade Evidence-Bounded AI News Production & Editorial System",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F7F8F8",
+  "theme_color": "#0E5B5B",
+  "categories": ["news", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

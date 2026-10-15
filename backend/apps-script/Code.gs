@@ -95,6 +95,7 @@ function doPost(e) {
  * Run this function in Apps Script editor to grant Drive and Sheets permissions.
  */
 function setupAuth() {
+  SpreadsheetService.initializeAllSheets();
   const result = Router.routeRequest({ action: 'healthCheck', payload: {}, method: 'GET' });
   Logger.log('Result: ' + JSON.stringify(result));
 }

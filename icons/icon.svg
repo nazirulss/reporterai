@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#137575"/>
+      <stop offset="50%" stop-color="#0E5B5B"/>
+      <stop offset="100%" stop-color="#084444"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DFBA63"/>
+      <stop offset="100%" stop-color="#A37E33"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="112" fill="url(#brandGrad)"/>
+
+  <!-- Subtle Inner Border -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.4"/>
+
+  <!-- Center Crest Symbol -->
+  <g filter="url(#shadow)">
+    <!-- Shield / Seal Contour -->
+    <path d="M 256 90 L 370 140 C 370 260 256 340 256 340 C 256 340 142 260 142 140 Z" fill="#063232" stroke="url(#goldGrad)" stroke-width="6" opacity="0.9"/>
+    
+    <!-- Bold 'R' Letterform in Serif Architecture -->
+    <text x="256" y="275" font-family="'Georgia', 'Times New Roman', serif" font-size="190" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">R</text>
+    
+    <!-- Gold AI Accent Dot -->
+    <circle cx="332" cy="170" r="14" fill="url(#goldGrad)" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <!-- Bottom Brand Ribbon Text -->
+  <g>
+    <rect x="110" y="380" width="292" height="42" rx="21" fill="url(#goldGrad)" filter="url(#shadow)"/>
+    <text x="256" y="407" font-family="'Inter', system-ui, sans-serif" font-size="20" font-weight="900" fill="#084444" text-anchor="middle" letter-spacing="4">REPORTER AI</text>
+  </g>
+</svg>

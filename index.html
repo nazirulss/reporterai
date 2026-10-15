@@ -2,8 +2,20 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>REPORTER AI — AI News Production & Editorial System (v1.0 Foundation)</title>
+
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0E5B5B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="REPORTER AI">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -137,26 +149,26 @@
     }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden text-sm">
+<body class="h-screen flex flex-col overflow-hidden text-sm bg-bgBase">
 
   <!-- Top Global Header -->
-  <header class="bg-surface border-b border-gray-200 px-4 py-2.5 flex items-center justify-between z-30 flex-shrink-0 shadow-sm">
-    <div class="flex items-center gap-3">
-      <button id="btn-toggle-sidebar" class="md:hidden text-gray-600 hover:text-gray-900 p-1 rounded focus:outline-none" aria-label="Toggle Menu">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+  <header class="bg-surface border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between z-30 flex-shrink-0 shadow-xs">
+    <div class="flex items-center gap-2 sm:gap-3">
+      <button id="btn-toggle-sidebar" onclick="Screens.toggleMobileSidebar()" class="md:hidden text-gray-600 hover:text-gray-900 p-1.5 rounded-lg hover:bg-gray-100 focus:outline-none" aria-label="Toggle Menu">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
       <div class="flex items-center gap-2 cursor-pointer" onclick="Router.navigate('dashboard')">
-        <div class="w-8 h-8 rounded bg-brand flex items-center justify-center text-white font-bold text-base shadow">
+        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-brand flex items-center justify-center text-white font-bold text-sm sm:text-base shadow">
           R
         </div>
         <div>
-          <span class="font-extrabold tracking-tight text-gray-900 text-base">REPORTER<span class="text-accent ml-1">AI</span></span>
-          <span class="hidden sm:inline-block ml-2 text-xs bg-brand-subtle text-brand px-2 py-0.5 rounded font-medium border border-teal-200">v1.0 Foundation</span>
+          <span class="font-extrabold tracking-tight text-gray-900 text-sm sm:text-base">REPORTER<span class="text-accent ml-0.5 sm:ml-1">AI</span></span>
+          <span class="hidden lg:inline-block ml-2 text-[11px] bg-brand-subtle text-brand px-2 py-0.5 rounded font-medium border border-teal-200">v1.0 Foundation</span>
         </div>
       </div>
     </div>
 
-    <!-- Active Story Breadcrumb & Status -->
+    <!-- Active Story Breadcrumb & Status (Desktop only) -->
     <div id="header-story-context" class="hidden md:flex items-center gap-3">
       <div class="text-xs text-mutedText flex items-center gap-1.5">
         <span>Story:</span>
@@ -174,19 +186,27 @@
       </div>
     </div>
 
-    <!-- Header Actions, Mode Badge & Synthetic Warning -->
-    <div class="flex items-center gap-2.5">
-      <div id="mode-badge" class="flex items-center gap-1.5 bg-purple-50 text-purple-900 text-xs px-2.5 py-1 rounded border border-purple-200 font-medium">
-        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-        <span>DEMO MODE (SYNTHETIC DATA)</span>
-      </div>
-
-      <button id="btn-quick-new" onclick="Router.navigate('projects/new')" class="bg-brand hover:bg-brand-dark text-white px-3 py-1.5 rounded font-medium flex items-center gap-1.5 shadow-sm transition-colors text-xs sm:text-sm">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        <span class="hidden sm:inline">Liputan Baru</span>
+    <!-- Header Actions, Mode Badge & PWA Install Button -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <!-- PWA Install Prompt Button -->
+      <button id="btn-pwa-install" onclick="Screens.installPwa()" class="hidden bg-accent-subtle border border-accent/40 text-accent-dark hover:bg-accent hover:text-white px-2 py-1 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center gap-1 transition-all">
+        <span>📲</span>
+        <span class="hidden sm:inline">Pasang PWA</span>
       </button>
 
-      <div class="border-l border-gray-200 pl-2.5 flex items-center gap-2">
+      <!-- Mode Badge with Responsive Label -->
+      <div id="mode-badge" class="flex items-center gap-1.5 bg-purple-50 text-purple-900 text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded border border-purple-200 font-medium">
+        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+        <span class="hidden sm:inline">DEMO MODE (SYNTHETIC DATA)</span>
+        <span class="sm:hidden font-bold">DEMO</span>
+      </div>
+
+      <button id="btn-quick-new" onclick="Router.navigate('projects/new')" class="hidden sm:flex bg-brand hover:bg-brand-dark text-white px-3 py-1.5 rounded-lg font-medium items-center gap-1.5 shadow-xs transition-colors text-xs sm:text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <span>Liputan Baru</span>
+      </button>
+
+      <div class="border-l border-gray-200 pl-2 hidden sm:flex items-center">
         <button onclick="Screens.confirmResetDemo()" title="Reset Demo ke data synthetic awal" class="text-xs text-gray-500 hover:text-brand font-medium border border-gray-200 hover:border-brand px-2 py-1 rounded bg-gray-50 transition-colors">
           Reset Demo
         </button>
@@ -196,10 +216,25 @@
 
   <div class="flex-1 flex overflow-hidden relative">
 
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" onclick="Screens.closeMobileSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-30 hidden md:hidden transition-opacity"></div>
+
     <!-- Primary Sidebar -->
-    <aside id="app-sidebar" class="w-60 bg-surface border-r border-gray-200 flex flex-col justify-between z-20 flex-shrink-0 transition-transform duration-200 md:translate-x-0 -translate-x-full md:relative absolute inset-y-0 left-0 shadow-md md:shadow-none">
-      <div class="py-4 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
-        <div class="px-4 pb-2 text-[11px] font-bold uppercase tracking-wider text-mutedText">Menu Utama</div>
+    <aside id="app-sidebar" class="w-64 bg-surface border-r border-gray-200 flex flex-col justify-between z-40 flex-shrink-0 transition-transform duration-200 md:translate-x-0 -translate-x-full md:relative fixed inset-y-0 left-0 shadow-2xl md:shadow-none">
+      
+      <!-- Mobile Sidebar Header -->
+      <div class="md:hidden flex items-center justify-between p-3.5 border-b border-gray-100 bg-brand text-white">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-white text-brand flex items-center justify-center font-bold text-xs">R</div>
+          <span class="font-bold text-sm tracking-tight">REPORTER AI</span>
+        </div>
+        <button onclick="Screens.closeMobileSidebar()" class="p-1 rounded-md text-white/80 hover:text-white hover:bg-white/10" aria-label="Tutup Menu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="py-3 flex flex-col gap-0.5 overflow-y-auto custom-scrollbar">
+        <div class="px-4 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-mutedText">Menu Utama</div>
         
         <button onclick="Router.navigate('dashboard')" class="nav-item flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-brand-subtle hover:text-brand transition-colors text-left font-medium" data-route="dashboard">
           <svg class="w-4 h-4 text-mutedText" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -211,7 +246,7 @@
           <span>News Projects</span>
         </button>
 
-        <div class="pt-4 px-4 pb-2 text-[11px] font-bold uppercase tracking-wider text-mutedText">Editorial Pipeline</div>
+        <div class="pt-3 px-4 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-mutedText">Editorial Pipeline</div>
 
         <button onclick="Router.navigate('workspace')" class="nav-item flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-brand-subtle hover:text-brand transition-colors text-left font-medium" data-route="workspace">
           <svg class="w-4 h-4 text-mutedText" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -233,7 +268,7 @@
           <span>Published News</span>
         </button>
 
-        <div class="pt-4 px-4 pb-2 text-[11px] font-bold uppercase tracking-wider text-mutedText">Sistem</div>
+        <div class="pt-3 px-4 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-mutedText">Sistem</div>
 
         <button onclick="Router.navigate('settings')" class="nav-item flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-brand-subtle hover:text-brand transition-colors text-left font-medium" data-route="settings">
           <svg class="w-4 h-4 text-mutedText" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -264,12 +299,36 @@
 
     <!-- Main Dynamic Content Workspace -->
     <main id="app-main" class="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-bgBase relative">
-      <div id="view-container" class="flex-1 flex flex-col p-4 md:p-6 max-w-7xl w-full mx-auto">
+      <div id="view-container" class="flex-1 flex flex-col p-3 sm:p-4 md:p-6 max-w-7xl w-full mx-auto pb-24 md:pb-6">
         <!-- Views rendered dynamically -->
       </div>
     </main>
 
   </div>
+
+  <!-- Mobile Bottom Navigation Bar (PWA Style) -->
+  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-gray-200 z-30 px-3 py-1.5 flex items-center justify-around shadow-lg">
+    <button onclick="Router.navigate('dashboard')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 text-gray-600 hover:text-brand transition-colors" data-route="dashboard">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <span class="text-[10px] font-medium mt-0.5">Beranda</span>
+    </button>
+    <button onclick="Router.navigate('projects')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 text-gray-600 hover:text-brand transition-colors" data-route="projects">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+      <span class="text-[10px] font-medium mt-0.5">Proyek</span>
+    </button>
+    <!-- Center Prominent Quick Action Button -->
+    <button onclick="Router.navigate('projects/new')" class="flex flex-col items-center justify-center -mt-6 bg-brand text-white p-3 rounded-full shadow-lg hover:bg-brand-dark active:scale-95 transition-all border-4 border-bgBase" aria-label="Liputan Baru">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+    </button>
+    <button onclick="Router.navigate('workspace')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 text-gray-600 hover:text-brand transition-colors" data-route="workspace">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+      <span class="text-[10px] font-medium mt-0.5">Redaksi</span>
+    </button>
+    <button onclick="Router.navigate('settings')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-2 text-gray-600 hover:text-brand transition-colors" data-route="settings">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+      <span class="text-[10px] font-medium mt-0.5">Sistem</span>
+    </button>
+  </nav>
 
   <!-- Reusable Modal Container -->
   <div id="app-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
@@ -4164,6 +4223,44 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
         Modal.close();
         Toast.success("Agenda kronologi berhasil dicatat.");
         Router.render();
+      },
+
+      toggleMobileSidebar() {
+        const sidebar = document.getElementById("app-sidebar");
+        const backdrop = document.getElementById("sidebar-backdrop");
+        if (sidebar) {
+          const isHidden = sidebar.classList.contains("-translate-x-full");
+          if (isHidden) {
+            sidebar.classList.remove("-translate-x-full");
+            if (backdrop) backdrop.classList.remove("hidden");
+          } else {
+            sidebar.classList.add("-translate-x-full");
+            if (backdrop) backdrop.classList.add("hidden");
+          }
+        }
+      },
+
+      closeMobileSidebar() {
+        const sidebar = document.getElementById("app-sidebar");
+        const backdrop = document.getElementById("sidebar-backdrop");
+        if (sidebar) sidebar.classList.add("-translate-x-full");
+        if (backdrop) backdrop.classList.add("hidden");
+      },
+
+      installPwa() {
+        if (window.deferredPwaPrompt) {
+          window.deferredPwaPrompt.prompt();
+          window.deferredPwaPrompt.userChoice.then(choice => {
+            if (choice.outcome === 'accepted') {
+              Toast.success("Aplikasi REPORTER AI berhasil dipasang di layar utama!");
+            }
+            window.deferredPwaPrompt = null;
+            const btn = document.getElementById("btn-pwa-install");
+            if (btn) btn.classList.add("hidden");
+          });
+        } else {
+          Toast.info("Untuk memasang aplikasi: Pada browser Chrome/Edge, klik ikon pasang di bilah alamat, atau pada Safari/iPhone tekan Bagikan lalu 'Tambah ke Layar Utama'.");
+        }
       }
     };
 
@@ -4188,11 +4285,7 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
           }
         }
 
-        const sidebar = document.getElementById("app-sidebar");
-        if (sidebar && !sidebar.classList.contains("-translate-x-full")) {
-          sidebar.classList.add("-translate-x-full");
-        }
-
+        Screens.closeMobileSidebar();
         this.render();
       },
 
@@ -4203,6 +4296,17 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
             el.classList.add("bg-brand-subtle", "text-brand", "font-semibold");
           } else {
             el.classList.remove("bg-brand-subtle", "text-brand", "font-semibold");
+          }
+        });
+
+        document.querySelectorAll(".mobile-nav-btn").forEach(el => {
+          const r = el.getAttribute("data-route");
+          if (r === route || (route.startsWith("workspace") && r === "workspace")) {
+            el.classList.add("text-brand");
+            el.classList.remove("text-gray-600");
+          } else {
+            el.classList.remove("text-brand");
+            el.classList.add("text-gray-600");
           }
         });
       },
@@ -4280,12 +4384,29 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
     window.addEventListener("DOMContentLoaded", () => {
       // Toggle Mobile Sidebar
       const toggleBtn = document.getElementById("btn-toggle-sidebar");
-      const sidebar = document.getElementById("app-sidebar");
-      if (toggleBtn && sidebar) {
+      if (toggleBtn) {
         toggleBtn.addEventListener("click", () => {
-          sidebar.classList.toggle("-translate-x-full");
+          Screens.toggleMobileSidebar();
         });
       }
+
+      // Register PWA Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+          console.log('[PWA] Service Worker registered:', reg.scope);
+        }).catch(err => {
+          console.warn('[PWA] Service Worker registration failed:', err);
+        });
+      }
+
+      // Handle PWA Install Prompt
+      window.deferredPwaPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        window.deferredPwaPrompt = e;
+        const pwaBtn = document.getElementById("btn-pwa-install");
+        if (pwaBtn) pwaBtn.classList.remove("hidden");
+      });
 
       // Initialize Synthetic Test Fixture
       initSyntheticState();
