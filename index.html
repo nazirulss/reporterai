@@ -387,11 +387,14 @@
     // =========================================================================
     // 1. CONFIG
     // =========================================================================
+    const savedApiUrl = localStorage.getItem("REPORTER_AI_API_URL") || "https://script.google.com/macros/s/AKfycbwM9xFlRbxyob4T6WLXkGYXCvCbtYUNdi0UDsF6uh3IW_x4VphC2q4TyMFdSF6Xq3YN8g/exec";
+    const savedDemoMode = localStorage.getItem("REPORTER_AI_DEMO_MODE") !== null ? localStorage.getItem("REPORTER_AI_DEMO_MODE") === "true" : false;
+
     const CONFIG = {
       APP_NAME: "REPORTER AI",
       VERSION: "1.0.0",
-      API_BASE_URL: "", // Live Google Apps Script Web App URL
-      DEMO_MODE: true,  // Defaults to synthetic demo data
+      API_BASE_URL: savedApiUrl, // Live Google Apps Script Web App URL
+      DEMO_MODE: savedDemoMode,   // Defaults to Live if Web App is configured
       REQUEST_TIMEOUT: 30000
     };
 
@@ -2264,6 +2267,13 @@
         };
 
         const res = await API.request("createProject", payload);
+        if (res && res.data) {
+          appState.currentProject = res.data;
+          appState.currentStage = res.data.current_stage || "FORM";
+          if (!appState.projects.find(p => p.project_id === res.data.project_id)) {
+            appState.projects.unshift(res.data);
+          }
+        }
         Toast.success("Proyek baru berhasil dibuat!");
         Router.navigate("workspace");
       },
@@ -3943,6 +3953,7 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
 
       toggleDemoMode(checked) {
         CONFIG.DEMO_MODE = checked;
+        localStorage.setItem("REPORTER_AI_DEMO_MODE", checked ? "true" : "false");
         document.getElementById("mode-badge").innerHTML = checked ? `
           <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
           <span>DEMO MODE (SYNTHETIC DATA)</span>
@@ -3953,6 +3964,9 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
         document.getElementById("quick-health-dot").className = checked ? "w-2 h-2 rounded-full bg-purple-500" : "w-2 h-2 rounded-full bg-emerald-500";
         document.getElementById("quick-db-status").innerText = checked ? "MOCK (Simulasi)" : "Connected (Spreadsheet)";
         document.getElementById("quick-ai-status").innerText = checked ? "SIMULATED (Saran)" : "Gemini API Proxy";
+        if (!checked) {
+          Screens.syncProjectsFromBackend();
+        }
         Toast.info(`Mode diubah ke: ${checked ? 'DEMO MODE (SINTETIS)' : 'LIVE API'}`);
       },
 
@@ -3960,11 +3974,41 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
         const url = document.getElementById("cfg-api-url").value.trim();
         CONFIG.API_BASE_URL = url;
         if (url) {
+          localStorage.setItem("REPORTER_AI_API_URL", url);
           CONFIG.DEMO_MODE = false;
-          document.getElementById("cfg-demo-toggle").checked = false;
+          localStorage.setItem("REPORTER_AI_DEMO_MODE", "false");
+          const toggle = document.getElementById("cfg-demo-toggle");
+          if (toggle) toggle.checked = false;
+        } else {
+          localStorage.removeItem("REPORTER_AI_API_URL");
         }
+        Screens.syncProjectsFromBackend();
         Toast.success("Konfigurasi URL API berhasil disimpan.");
         Router.render();
+      },
+
+      async syncProjectsFromBackend() {
+        if (!CONFIG.DEMO_MODE && CONFIG.API_BASE_URL) {
+          try {
+            const res = await API.request("listProjects");
+            if (res && res.data) {
+              const items = Array.isArray(res.data) ? res.data : (res.data.items || []);
+              if (items.length > 0) {
+                appState.projects = items;
+                if (!appState.currentProject || appState.currentProject.project_id === "DEMO-NEWS-001") {
+                  appState.currentProject = items[0];
+                  appState.currentStage = items[0].current_stage || "FORM";
+                }
+                const container = document.getElementById("view-container");
+                if (container && Router.currentRoute === "projects") {
+                  container.innerHTML = Screens.ProjectsList();
+                }
+              }
+            }
+          } catch (e) {
+            console.warn("Sync projects error:", e);
+          }
+        }
       },
 
       async testHealthCheck() {
@@ -3972,7 +4016,9 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
         try {
           const res = await API.request("healthCheck");
           AIOverlay.hide();
-          Toast.success(`Koneksi OK: Database ${res.data.database}, AI ${res.data.ai}`);
+          const db = res.data?.database || (res.data?.status === "READY" ? "CONNECTED" : "OK");
+          const ai = res.data?.checks?.gemini_configured ? "Gemini Ready" : (res.data?.ai || "Active");
+          Toast.success(`Koneksi OK: Database ${db}, AI ${ai}`);
         } catch (err) {
           AIOverlay.hide();
         }
@@ -4410,6 +4456,11 @@ Ketua Komunitas menyampaikan harapan agar pojok baca balai desa berlanjut sebaga
 
       // Initialize Synthetic Test Fixture
       initSyntheticState();
+
+      // Sync with live backend if configured
+      if (!CONFIG.DEMO_MODE && CONFIG.API_BASE_URL) {
+        Screens.syncProjectsFromBackend();
+      }
 
       // Handle Hash Routing
       const getCleanHash = () => window.location.hash.replace(/^#\/?/, "");
